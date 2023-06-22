@@ -3,7 +3,7 @@
 
 #include <QUdpSocket>
 
-union __attribute__((__packed__)) Connection {
+struct __attribute__((__packed__)) Connection {
     quint32 action;
     quint32 transaction_id;
     quint64 connection_id;

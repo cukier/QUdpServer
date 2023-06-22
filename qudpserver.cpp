@@ -43,6 +43,8 @@ QUdpServer::QUdpServer(QObject *parent)
                  << response.response.connection_id
                  << "\ntransaction_id "
                  << response.response.transaction_id;
-        socket->get
+        socket->writeDatagram(QByteArray(reinterpret_cast<char*>(&response),
+                                         sizeof(response)), host, port);
+
     }
 }

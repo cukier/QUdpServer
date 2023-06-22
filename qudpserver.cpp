@@ -44,7 +44,7 @@ QUdpServer::QUdpServer(QObject *parent)
                  << "\ntransaction_id "
                  << response.response.transaction_id;
         socket->writeDatagram(QByteArray(reinterpret_cast<char*>(&response),
-                                         sizeof(response)), host, port);
+                                         sizeof(response)), sender, senderPort);
 
     }
 }

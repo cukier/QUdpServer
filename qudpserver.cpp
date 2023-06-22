@@ -4,16 +4,9 @@
 #include <QUdpSocket>
 
 union __attribute__((__packed__)) Connection {
-    struct __attribute__((__packed__)) {
-        quint64 connection_id;
-        quint32 action;
-        quint32 transaction_id;
-    } request ;
-    struct __attribute__((__packed__)) {
-        quint32 action;
-        quint32 transaction_id;
-        quint64 connection_id;
-    } response ;
+    quint32 action;
+    quint32 transaction_id;
+    quint64 connection_id;
 };
 
 QUdpServer::QUdpServer(QObject *parent)
@@ -38,11 +31,11 @@ QUdpServer::QUdpServer(QObject *parent)
                  << " porta "
                  << senderPort
                  << "\naction "
-                 << response.response.action
+                 << response.action
                  << "\nconnection_id "
-                 << response.response.connection_id
+                 << response.connection_id
                  << "\ntransaction_id "
-                 << response.response.transaction_id;
+                 << response.transaction_id;
         socket->writeDatagram(QByteArray(reinterpret_cast<char*>(&response),
                                          sizeof(response)), sender, senderPort);
 

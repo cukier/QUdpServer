@@ -1,6 +1,7 @@
 #include "stunclient.h"
 
 #include <QRandomGenerator>
+#include <iostream>
 
 /*
  * Both contructors is simple and only do is set the Stun endpoint server
@@ -10,15 +11,13 @@ StunClient::StunClient(QHostAddress host, quint16 port, QObject *parent)
     : QUdpSocket (parent) {
     this->host = host;
     this->port = port;
-//    finishStart();
+    //    finishStart();
 }
 
-StunClient::StunClient(const QString &url, QObject *parent) : StunClient(
-        QHostInfo::fromName(QUrl(url).host()).addresses()[0],
-        static_cast<quint16>(QUrl(url).port()),
-        parent
-        ){
-
+StunClient::StunClient(const QString &url, QObject *parent)
+    : StunClient(QHostInfo::fromName(QUrl(url).host()).addresses()[0],
+      static_cast<quint16>(QUrl(url).port()), parent)
+{
 }
 
 void StunClient::binding()
@@ -59,13 +58,15 @@ void StunClient::binding()
     if(header.Transaction_ID.ints[0] != header_recived.Transaction_ID.ints[0] &&
             header.Transaction_ID.ints[1] != header_recived.Transaction_ID.ints[1] &&
             header.Transaction_ID.ints[2] != header_recived.Transaction_ID.ints[2]) {
-        qDebug() << "Deu merda STUN";
+        std::cout << "Deu merda STUN\n";
+        std::cout.flush();
         return;
     }
 
     //if the responce type is a error type
     if(header_recived.Message_Type == 0x0111) {
-        qDebug() << "Deu merda2 STUN";
+        std::cout << "Deu merda2 STUN\n";
+        std::cout.flush();
         return;
     }
 
@@ -74,7 +75,11 @@ void StunClient::binding()
 
     //show the update public endpoint
     MappedAddressModel *attr = reinterpret_cast<MappedAddressModel *>(currentAtributes[0]);
-    qDebug() << QHostAddress(attr->point.address.ipv4.num) << attr->point.port;
+    std::cout << QHostAddress(attr->point.address.ipv4.num).toString().toStdString()
+              << ' '
+              << attr->point.port
+              << std::endl;
+    std::cout.flush();
 
     //emit the updated signal
     emit updated();
@@ -155,9 +160,9 @@ void StunClient::decodeRecive(QByteArray data)
             //Add the created attribute to the list
             currentAtributes << map;
 
-        //   I have found one server case that treats 0x8020 and 0x0020
-        // as XOR-MAPPED-ADDRESS attribute, but in original documentation
-        // only 0x0020 is right
+            //   I have found one server case that treats 0x8020 and 0x0020
+            // as XOR-MAPPED-ADDRESS attribute, but in original documentation
+            // only 0x0020 is right
         } else if(attr->type == 0x0020 || attr->type == 0x8020) {
             //As XOR-MAPPED-ADDRESS is the same of MappedAddress
             //so to facilitate the things i have use the same class

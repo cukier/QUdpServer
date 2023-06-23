@@ -2,6 +2,7 @@
 #include "stunclient.h"
 
 #include <QUdpSocket>
+#include <iostream>
 
 struct Comando {
     quint16 id;
@@ -47,19 +48,21 @@ QUdpServer::QUdpServer(QObject *parent)
         QHostAddress sender;
         quint16 senderPort;
 
-        qDebug() << "Aguardando...";
+        std::cout << "Aguardando...\n";
+        std::cout.flush();
         while(!socket->hasPendingDatagrams());
         socket->readDatagram(reinterpret_cast<char*>(&response),
                              sizeof(Connection),
                              &sender, &senderPort);
-        qDebug() << "Recebido de "
-                 << sender.toString()
-                 << " porta "
-                 << senderPort
-                 << '\n'
-                 << response.toString();
+        std::cout << "Recebido de "
+                  << sender.toString().toStdString()
+                  << " porta "
+                  << senderPort
+                  << '\n'
+                  << response.toString().toStdString()
+                  << std::endl;
+        std::cout.flush();
         socket->writeDatagram(QByteArray(reinterpret_cast<char*>(&response),
                                          sizeof(response)), sender, senderPort);
-
     }
 }
